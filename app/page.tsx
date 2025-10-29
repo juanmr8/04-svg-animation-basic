@@ -9,7 +9,7 @@ export default function Page() {
 	return (
 		<LenisProvider>
 			<div>
-				<div className='not-only:ypx-[32px] relative pt-[120px]'>
+				<div className='relative pt-[120px] not-only:px-[32px]'>
 					{/** Title & Bottom Line */}
 					<TopText />
 					<div className='relative'>
@@ -36,18 +36,16 @@ const BottomLine = () => {
 	let progress = 0;
 	let time = Math.PI / 2;
 	let reqId: number | null = null;
-	let x: number = 0.5;
+	let x = 0.5;
+	const LERP = (x: number, y: number, t: number) => x * (1 - t) + y * t;
 
 	useEffect(() => {
 		setPath(progress);
 	}, [progress]);
 
-	const LERP = (x: number, y: number, t: number) => x * (1 - t) + y * t;
-
 	const setPath = (value: number) => {
 		const { innerWidth } = window;
-		path.current?.setAttributeNS(
-			null,
+		path.current?.setAttribute(
 			'd',
 			`M0 250 Q${innerWidth * x} ${250 + value}, ${innerWidth} 250`
 		);
@@ -55,10 +53,11 @@ const BottomLine = () => {
 
 	const handleMouseMove = (e: React.MouseEvent<HTMLDivElement>) => {
 		const { movementY, clientX } = e;
-		const { width, left } = path.current?.getBoundingClientRect() || {
+		console.log(movementY);
+		const { width } = path.current?.getBoundingClientRect() || {
 			width: 0,
 		};
-		x = (clientX - left!) / width;
+		x = clientX / width;
 		progress += movementY;
 		setPath(progress);
 	};
@@ -78,7 +77,6 @@ const BottomLine = () => {
 	const resetAnimation = () => {
 		time = Math.PI / 2;
 		progress = 0;
-		setPath(progress);
 	};
 
 	const handleMouseLeave = () => {
@@ -125,10 +123,6 @@ const MiddleContent = () => {
 		target: ref,
 		offset: ['100px', '500px'],
 	});
-
-	useEffect(() => {
-		console.log(scrollYProgress);
-	}, [scrollYProgress]);
 
 	const path = useRef<SVGPathElement>(null);
 	const pathLength = useTransform(scrollYProgress, [0, 1], [0, 1]);
